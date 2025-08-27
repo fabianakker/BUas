@@ -25,9 +25,10 @@
 
         .container {
             text-align: center;
-            padding: 40px;
+            padding: 20px;
             max-width: 800px;
             width: 90%;
+            margin-top: -60px;
         }
 
         h1 {
@@ -136,7 +137,7 @@
     </div>
 
     <script>
-        const steamTags = [
+        const genreTags = [
             // Core Genres
             'Action', 'Adventure', 'Indie', 'RPG', 'Strategy', 'Simulation', 'Casual', 'Puzzle', 
             'Racing', 'Sports', 'Fighting', 'Shooter', 'Platformer', 'Survival', 'Horror', 
@@ -154,7 +155,10 @@
             'Bullet Hell', 'Shmup', 'Fighting 2D', 'Wrestling', 'Combat Racing', 'Kart Racing',
             'Arcade Racing', 'Rally', 'Formula Racing', 'Motocross', 'Skateboarding', 'Snowboarding',
             'Golf', 'Tennis', 'Soccer', 'Basketball', 'Baseball', 'American Football', 'Hockey',
-            'Bowling', 'Pool', 'Fishing & Hunting', 'Hunting', 'Archery',
+            'Bowling', 'Pool', 'Fishing & Hunting', 'Hunting', 'Archery'
+        ];
+
+        const otherTags = [
             
             // Themes & Settings
             'Fantasy', 'Sci-fi', 'Medieval', 'Post-apocalyptic', 'Cyberpunk', 'Western', 'Military',
@@ -267,8 +271,17 @@
         ];
 
         function getRandomTags() {
-            const shuffled = [...steamTags].sort(() => 0.5 - Math.random());
-            return [shuffled[0], shuffled[1]];
+            // Always pick a genre/subgenre for the first tag
+            const genre = genreTags[Math.floor(Math.random() * genreTags.length)];
+            
+            // Pick a random tag from all tags for the second tag (excluding the chosen genre)
+            const allTags = [...genreTags, ...otherTags];
+            let secondTag;
+            do {
+                secondTag = allTags[Math.floor(Math.random() * allTags.length)];
+            } while (secondTag === genre);
+            
+            return [genre, secondTag];
         }
 
         function generateNewTags() {
