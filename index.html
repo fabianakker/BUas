@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steam Tag Picker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1b2838, #2a475e);
+            color: white;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            padding: 40px;
+            max-width: 800px;
+            width: 90%;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 60px;
+            color: #66c0f4;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            animation: fadeIn 1s ease-out;
+        }
+
+        .tags-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            margin-bottom: 80px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: linear-gradient(145deg, #66c0f4, #4a90e2);
+            padding: 20px 30px;
+            border-radius: 15px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            box-shadow: 0 8px 20px rgba(102, 192, 244, 0.3);
+            border: 2px solid rgba(255,255,255,0.2);
+            min-width: 200px;
+            transform: scale(1);
+            transition: all 0.3s ease;
+        }
+
+        .tag:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 30px rgba(102, 192, 244, 0.5);
+        }
+
+        .separator {
+            font-size: 2.5rem;
+            color: #66c0f4;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .new-tags-btn {
+            background: linear-gradient(145deg, #67c23a, #5daf34);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(103, 194, 58, 0.4);
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .new-tags-btn:hover {
+            background: linear-gradient(145deg, #5daf34, #529e2e);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(103, 194, 58, 0.6);
+        }
+
+        .new-tags-btn:active {
+            transform: translateY(0);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .tag.updating {
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; margin-bottom: 40px; }
+            .tags-container { flex-direction: column; gap: 20px; margin-bottom: 50px; }
+            .tag { font-size: 1.4rem; min-width: 250px; }
+            .separator { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Steam Tag Picker</h1>
+        <div class="tags-container">
+            <div class="tag" id="tag1">Action</div>
+            <div class="separator">+</div>
+            <div class="tag" id="tag2">Adventure</div>
+        </div>
+        <button class="new-tags-btn" onclick="generateNewTags()">Pick New Tags</button>
+    </div>
+
+    <script>
+        const steamTags = [
+            // Core Genres
+            'Action', 'Adventure', 'Indie', 'RPG', 'Strategy', 'Simulation', 'Casual', 'Puzzle', 
+            'Racing', 'Sports', 'Fighting', 'Shooter', 'Platformer', 'Survival', 'Horror', 
+            'Roguelike', 'MMORPG', 'Sandbox', 'Tower Defense', 'Real Time Strategy', 'Turn-Based Strategy',
+            'Visual Novel', 'Point & Click', 'Beat \'em up', 'Hack and Slash', 'Stealth', 'Open World', 
+            'Metroidvania', 'Battle Royale', 'Card Game', 'Board Game', 'Educational', 'Music', 'Rhythm',
+            'Dating Sim', 'Management', 'Building', 'Crafting', 'Exploration', 'Arena Shooter',
+            
+            // Sub-genres & Specific Types
+            'Action-Adventure', 'Action RPG', 'First-Person Shooter', 'Third-Person Shooter',
+            'JRPG', 'Tactical RPG', 'Dungeon Crawler', 'Roguelite', 'Auto Battler', 'MOBA',
+            'City Builder', 'Base Building', 'Colony Sim', 'Life Sim', 'Flight Simulator',
+            'Driving Simulator', 'Train Simulator', 'Farming Simulator', 'Precision Platformer',
+            'Puzzle Platformer', 'Physics', 'Match 3', 'Hidden Object', 'Escape Room',
+            'Bullet Hell', 'Shmup', 'Fighting 2D', 'Wrestling', 'Combat Racing', 'Kart Racing',
+            'Arcade Racing', 'Rally', 'Formula Racing', 'Motocross', 'Skateboarding', 'Snowboarding',
+            'Golf', 'Tennis', 'Soccer', 'Basketball', 'Baseball', 'American Football', 'Hockey',
+            'Bowling', 'Pool', 'Fishing & Hunting', 'Hunting', 'Archery',
+            
+            // Themes & Settings
+            'Fantasy', 'Sci-fi', 'Medieval', 'Post-apocalyptic', 'Cyberpunk', 'Western', 'Military',
+            'Zombie', 'Anime', 'Historical', 'Alternate History', 'Modern', 'Contemporary',
+            'Ancient', 'Victorian', 'Noir', 'Dieselpunk', 'Steampunk', 'Space', 'Underwater',
+            'Time Travel', 'Aliens', 'Dragons', 'Magic', 'Superhero', 'Detective', 'Crime', 'War',
+            'Naval Combat', 'World War I', 'World War II', 'Cold War', 'Vietnam War',
+            'Pirates', 'Ninjas', 'Samurai', 'Knights', 'Vikings', 'Wild West', 'Old West',
+            'Mythology', 'Greek Mythology', 'Norse Mythology', 'Lovecraftian', 'Gothic',
+            'Vampire', 'Werewolves', 'Demons', 'Angels', 'Robots', 'Mecha', 'Kaiju',
+            
+            // Visual Styles
+            'Pixel Graphics', 'Retro', '2D', '3D', 'Voxel', 'Low-poly', 'Hand-drawn', 'Cartoon',
+            'Realistic', 'Abstract', 'Minimalist', 'Stylized', 'Cute', 'Dark', 'Colorful',
+            'Monochrome', 'Photorealistic', 'Cel Shaded', 'Painterly', 'Comic Book',
+            
+            // Camera & Perspective
+            'First-Person', 'Third-Person', 'Top-Down', 'Isometric', 'Side Scroller', 'Fixed Camera',
+            '2.5D', 'Bird\'s Eye View', 'Cinematic', 'Multiple Perspectives',
+            
+            // Player Support & Features
+            'Single-player', 'Multiplayer', 'Local Co-Op', 'Online Co-Op', 'Local Multiplayer',
+            'Cross-Platform Multiplayer', 'MMO', 'Massively Multiplayer', 'Co-op Campaign',
+            'Split Screen', 'Shared/Split Screen', 'Hot Seat', 'LAN', 'Online PvP', 'Local PvP',
+            'Competitive', 'Cooperative', 'Team-Based', 'Asynchronous Multiplayer',
+            'PvP', 'PvE', '1 vs 1', '1v1', '4 Player Local', '8 Player Local',
+            
+            // Input & Accessibility
+            'Controller', 'Keyboard', 'Mouse', 'Touch-Friendly', 'Remote Play on Phone',
+            'Remote Play on Tablet', 'Remote Play on TV', 'Partial Controller Support',
+            'Full Controller Support', 'VR Supported', 'VR Only', 'VR Optional',
+            'Motion Controls', 'Haptic Feedback', 'Eye Tracking', 'Voice Control',
+            
+            // Technical Features
+            'Steam Workshop', 'Steam Cloud', 'Steam Achievements', 'Steam Trading Cards',
+            'Steam Leaderboards', 'Stats', 'Commentary Available', 'Includes Source SDK',
+            'Includes Level Editor', 'Mod', 'Moddable', 'User-Generated Content', 'Workshop',
+            'Level Editor', 'Map Editor', 'Character Creator', 'Photo Mode',
+            
+            // Gameplay Features & Mechanics
+            'Story Rich', 'Narrative', 'Character Customization', 'Choices Matter', 'Multiple Endings',
+            'Branching Story', 'Interactive Fiction', 'Text-Based', 'Dialogue Trees',
+            'Character Development', 'Skill Tree', 'Leveling', 'Experience Points', 'Loot',
+            'Inventory Management', 'Equipment', 'Weapon Crafting', 'Item Crafting',
+            'Resource Management', 'Economy', 'Trading', 'Marketplace', 'Bartering',
+            'Procedural Generation', 'Randomly Generated', 'Permadeath', 'Hardcore',
+            'Score Attack', 'Time Attack', 'Endless', 'Replay Value', 'Replayability',
+            'Collectibles', 'Achievements', 'Completionist', 'Speedrun', 'Time Trial',
+            
+            // Difficulty & Pacing
+            'Difficult', 'Unforgiving', 'Punishing', 'Challenging', 'Easy', 'Relaxing',
+            'Casual', 'Hardcore', 'Fast-Paced', 'Slow-Paced', 'Real-Time', 'Turn-Based',
+            'Pausable Real-Time', 'Tactical', 'Strategic', 'Methodical',
+            
+            // Activities & Actions
+            'Fishing', 'Farming', 'Cooking', 'Mining', 'Sailing', 'Flying', 'Driving', 'Swimming',
+            'Climbing', 'Parkour', 'Skateboarding', 'Snowboarding', 'Skiing', 'Surfing',
+            'Dancing', 'Singing', 'Playing', 'Gambling', 'Betting', 'Card Battle',
+            'Deck Building', 'Hand Management', 'Tile Placement', 'Worker Placement',
+            'Area Control', 'Set Collection', 'Pattern Building', 'Engine Building',
+            'Programming', 'Hacking', 'Investigation', 'Mystery', 'Puzzle Solving',
+            'Logic', 'Math', 'Word Game', 'Trivia', 'Quiz', 'Educational Games',
+            
+            // Emotional Tone & Mood  
+            'Atmospheric', 'Immersive', 'Cinematic', 'Epic', 'Emotional', 'Heartwarming',
+            'Touching', 'Sad', 'Melancholic', 'Depressing', 'Dark', 'Disturbing', 'Creepy',
+            'Psychological Horror', 'Jump Scare', 'Suspense', 'Thriller', 'Mystery',
+            'Comedy', 'Funny', 'Humor', 'Parody', 'Satire', 'Memes', 'Great Soundtrack',
+            'Dynamic Narration', 'Voice Acting', 'Silent Protagonist', 'Female Protagonist',
+            'LGBTQ+', 'Romance', 'Mature', 'Violent', 'Gore', 'Sexual Content', 'Nudity',
+            
+            // Business Model & Pricing
+            'Free to Play', 'Free-to-Play', 'Freemium', 'Pay-to-Win', 'Microtransactions',
+            'DLC', 'Season Pass', 'Early Access', 'In-App Purchases', 'Subscription',
+            'One-Time Purchase', 'Demo Available', 'Beta', 'Alpha', 'Prototype',
+            
+            // Platform & System
+            'Windows', 'Mac', 'Linux', 'SteamOS', 'Steam Deck', 'VR', 'AR', 'Mobile',
+            'Web Browser', 'Cross-Platform', 'Remote Play', 'Steam Link', 'Big Picture',
+            'Steam Input', 'Native Steam Deck', 'Steam Deck Verified', 'Steam Deck Playable',
+            
+            // Time & Length
+            'Short', 'Long', 'Medium Length', 'Epic Length', 'Endless', 'Episodic',
+            'Chapters', 'Seasons', 'Mini Episodes', 'Quick Play', 'Session-Based',
+            'Always Online', 'Offline Play', 'No Internet Required',
+            
+            // Special Categories
+            'Experimental', 'Artgame', 'Abstract', 'Surreal', 'Philosophical', 'Political',
+            'Social Commentary', 'Historical Fiction', 'Biography', 'Documentary',
+            'Educational', 'Simulation', 'Training', 'Tutorial', 'Learning',
+            'Autism-Friendly', 'Colorblind-Friendly', 'Deaf-Friendly', 'Subtitles',
+            'Audio Description', 'Accessible', 'Family Friendly', 'Kid-Friendly', 'All Ages',
+            'Teen', 'Mature 17+', 'Adults Only', 'Blood', 'Violence', 'Language',
+            
+            // Niche & Specialty
+            'Otome', 'Yaoi', 'Yuri', 'Bara', 'Furry', 'Anthropomorphic', 'Talking Animals',
+            'Robots', 'Cyborgs', 'AI', 'Machine Learning', 'Neural Networks', 'Blockchain',
+            'Cryptocurrency', 'NFT', 'Web3', 'Metaverse', 'Social Media', 'Streaming',
+            'Content Creation', 'Video Production', 'Audio Production', 'Game Development',
+            'Programming', 'Software', 'Utility', 'Productivity', 'Business',
+            
+            // Emergent & Community
+            'Meme', 'Viral', 'Internet Culture', 'Nostalgia', 'Retro Revival', 'Remake', 'Remaster',
+            'Spiritual Successor', 'Fan Made', 'Community Choice', 'Indie Darling', 'Hidden Gem',
+            'Cult Classic', 'Sleeper Hit', 'Breakthrough Indie', 'Award Winner', 'Controversial',
+            
+            // Technical & Performance
+            '60 FPS', '120 FPS', '4K', '8K', 'HDR', 'Ray Tracing', 'DLSS', 'FSR', 'VSync',
+            'G-Sync', 'FreeSync', 'Ultra Wide', 'Multi-Monitor', 'Benchmarking', 'Stress Test'
+        ];
+
+        function getRandomTags() {
+            const shuffled = [...steamTags].sort(() => 0.5 - Math.random());
+            return [shuffled[0], shuffled[1]];
+        }
+
+        function generateNewTags() {
+            const [tag1, tag2] = getRandomTags();
+            const tag1Element = document.getElementById('tag1');
+            const tag2Element = document.getElementById('tag2');
+            
+            // Add animation class
+            tag1Element.classList.add('updating');
+            tag2Element.classList.add('updating');
+            
+            // Update text after a brief delay
+            setTimeout(() => {
+                tag1Element.textContent = tag1;
+                tag2Element.textContent = tag2;
+            }, 250);
+            
+            // Remove animation class after animation completes
+            setTimeout(() => {
+                tag1Element.classList.remove('updating');
+                tag2Element.classList.remove('updating');
+            }, 500);
+        }
+
+        // Generate initial tags on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            generateNewTags();
+        });
+    </script>
+</body>
+</html>
