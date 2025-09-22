@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotterdam Architecture Walk - Level Design Excursion</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        
+        .route-overview {
+            background: rgba(103, 126, 234, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 500;
+            color: #5b6987;
+        }
+        
+        .map-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 0;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+        
+        .map-placeholder {
+            background: linear-gradient(135deg, rgba(103, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .map-content h3 {
+            color: #2c3e50;
+            font-size: 1.5em;
+            margin: 15px 0;
+        }
+        
+        .map-icon-large {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        
+        .route-details {
+            color: #5b6987;
+            line-height: 1.8;
+            margin: 20px 0;
+        }
+        
+        .route-points {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin: 25px 0;
+        }
+        
+        .route-point {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 0.95em;
+            color: #5b6987;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .map-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .map-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(103, 126, 234, 0.3);
+        }
+        
+        .location-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+        
+        .location-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+        }
+        
+        .location-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px 30px;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        
+        .location-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+        }
+        
+        .location-content {
+            padding: 30px;
+        }
+        
+        .building-section {
+            margin-bottom: 25px;
+        }
+        
+        .building-title {
+            color: #667eea;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 8px;
+            color: #5b6987;
+        }
+        
+        li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #764ba2;
+            font-weight: bold;
+        }
+        
+        .takeaways-card {
+            background: linear-gradient(135deg, rgba(103, 126, 234, 0.9), rgba(118, 75, 162, 0.9));
+            color: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-top: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        .takeaways-card h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        
+        .takeaway-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .takeaway-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .takeaways-card li {
+            color: white;
+        }
+        
+        .takeaways-card li:before {
+            color: #ffd700;
+        }
+        
+        .insight-box {
+            background: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid #ffd700;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+            font-style: italic;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+            .location-image {
+                height: 250px;
+            }
+            .container {
+                padding: 10px;
+            }
+            header, .location-content, .takeaways-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Rotterdam Architecture Walk</h1>
+            <div class="subtitle">Level Design Excursion Guide</div>
+            <div class="route-overview">
+                <strong>Route:</strong> Central Station → Erasmus Bridge → Geldersekade → Rotterdam Blaak → Koopgoot → Central Station
+            </div>
+        </header>
+
+        <div class="location-card">
+            <div class="location-header">📍 SKETCH LOCATION 1: Erasmus Bridge & Kop van Zuid</div>
+            <img src="https://lh3.googleusercontent.com/gpms-cs-s/AB8u6HZibnCLjDZeOg0DDJko0Eoo9igNije-U7GjyUHoJePn85J8JrpXUACf9NKqb59iSBfSDHK6-Lgra6noZy9VNtY5gZAFrpwV8jdmWOI2INYIm6A6UyoQ6DOz_rl5WPxgl8Pb4uYg=w900-h600-k-no-pi-9.65511988866568-ya339.4186830833827-ro0-fo100" alt="Erasmus Bridge View" class="location-image">
+            <div class="location-content">
+                <div class="building-section">
+                    <div class="building-title">Erasmus Bridge "The Swan" (1996)</div>
+                    <ul>
+                        <li>802m long, 139m asymmetrical pylon creates dramatic vertical in horizontal landscape</li>
+                        <li>Iconic silhouette often referred to as "the Swan", looks white but blue</li>
+                        <li>Connects north/south Rotterdam over the Nieuwe Maas</li>
+                    </ul>
+                </div>
+                <div class="building-section">
+                    <div class="building-title">Kop van Zuid</div>
+                    <ul>
+                        <li>Former docklands transformed to mixed-use district</li>
+                        <li>Cruiseships would dock here Holland Amerika Lijn - Hotel New York</li>
+                        <li>Multiple musea World Art Museum (100.000 objects) and Photo museum</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="location-card">
+            <div class="location-header">📍 SKETCH LOCATION 2: Geldersekade Views</div>
+            <img src="https://streetviewpixels-pa.googleapis.com/v1/thumbnail?cb_client=maps_sv.tactile&w=900&h=600&pitch=-0.8927887714450975&panoid=1p2-alkMqTRhcBa6tKCxlw&yaw=26.905299418652984" alt="Geldersekade View" class="location-image">
+            <div class="location-content">
+                <div class="building-section">
+                    <div class="building-title">Cube Houses (1984, Piet Blom)</div>
+                    <ul>
+                        <li>Houses tilted 45° to create "forest" Blaakse Forest</li>
+                        <li>38 cubes maximize density while maintaining individuality</li>
+                        <li>Only 25% usable floor space - form creates constraints</li>
+                    </ul>
+                </div>
+                <div class="building-section">
+                    <div class="building-title">Oude Haven & Witte Huis</div>
+                    <ul>
+                        <li>Oldest harbor (1350s) - only pre-war remnant</li>
+                        <li>Witte Huis (1898): Europe's first high-rise, 43m Art Nouveau survivor</li>
+                        <li>Temporal layering: historic water meets ultramodern surroundings</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="location-card">
+            <div class="location-header">📍 SKETCH LOCATION 3: Rotterdam Blaak</div>
+            <img src="https://streetviewpixels-pa.googleapis.com/v1/thumbnail?cb_client=maps_sv.tactile&w=900&h=600&pitch=-7.19582215612013&panoid=ExuzdF_mgni995iAVRAXxA&yaw=269.3462543510987" alt="Rotterdam Blaak View" class="location-image">
+            <div class="location-content">
+                <div class="building-section">
+                    <div class="building-title">Markthal (2014, MVRDV)</div>
+                    <ul>
+                        <li>Horseshoe solves weather protection market + 228 residential integration</li>
+                        <li>11,000m² ceiling artwork "Cornucopia" - 2 footbal fields - largest in Netherlands</li>
+                        <li>Largest glass facade in Europe</li>
+                    </ul>
+                </div>
+                <div class="building-section">
+                    <div class="building-title">Central Library (2007)</div>
+                    <ul>
+                        <li>Yellow ventilation pipes celebrated, not hidden - "honest architecture"</li>
+                        <li>Terraced interior creates natural gathering spaces and sight lines</li>
+                    </ul>
+                </div>
+                <div class="building-section">
+                    <div class="building-title">Grote Kerk</div>
+                    <ul>
+                        <li>Only medieval building in Rotterdam (rebuilt post-1940)</li>
+                        <li>Gothic verticality vs horizontal modernism = visual rhythm</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="takeaways-card">
+            <h2>Useful Info</h2>
+            
+            <div class="takeaway-section">
+                <div class="takeaway-title">When and Where</div>
+                <ul>
+                    <li>We meet at the central station at 10:00</li>
+                    <li>The excursion will take about 2 hours in total.</li>
+					<li>You can join the group or walk on your own.</li>
+                    <li>Wear comfortable shoes the total walk is 5.3KM.</li>
+                    <li>Bring sketching materials.</li>
+                </ul>
+            </div>
+            
+            <div class="takeaway-section">
+                <div class="takeaway-title">Sketching</div>
+                <ul>
+                    <li>We'll take 20min per sketching location.</li>
+					<li>There is bonus location with some nice ships and cranes at the Scheepmakerskade. You'll pass there when we are at the Rederijbrug.</li>
+                    <li>We end our excursion at the Markthal which has a lot of nice places to eat.</li>
+                    <li>After the excursion you are free to discover the city centre or return to BUas.</li>
+					<li>Here is a direct overview of <a href="https://www.google.com/maps/dir/Rotterdam+Central+Station,+3013+AJ+Rotterdam/51.9116506,4.4776017/51.9116283,4.4842704/51.9153508,4.4864972/51.916575,4.4894047/51.9192518,4.4911106/51.9204263,4.490102/51.9205273,4.4887164/51.9197878,4.4778252/51.9234675,4.4707998/@51.9191619,4.4770342,1925m/data=!3m1!1e3!4m17!4m16!1m5!1m1!1s0x47c434a5bc629449:0xb4834251ce273735!2m2!1d4.4699155!2d51.9243233!1m0!1m0!1m0!1m0!1m0!1m0!1m0!1m0!1m0!3e2!5m1!1e4?entry=ttu&g_ep=EgoyMDI1MDkwNy4wIKXMDSoASAFQAw%3D%3D </li>  
+">the route</a></ul>
+            </div>
+            
+        </div>
+    </div>
+</body>
+</html>
